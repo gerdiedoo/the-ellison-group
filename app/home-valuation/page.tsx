@@ -1,0 +1,8 @@
+import { PageHero,DemoNote } from '@/components/ui/primitives';
+import { ValuationForm } from '@/components/forms/valuation-form';
+import { ContactDetails } from '@/components/shell/site-provider';
+import { getListings } from '@/lib/data';
+import { metadata } from '@/lib/seo';
+export const generateMetadata=()=>metadata('Home Valuation','/home-valuation','Get your instant home valuation or a personal market analysis from The Ellison Group.');
+export const dynamic='force-dynamic';
+export default async function ValuationPage({searchParams}:{searchParams:Promise<{address?:string}>}){const{address}=await searchParams;const comps=(await getListings()).filter(l=>l.status==='sold');return <><PageHero eyebrow="A thoughtful starting point" title="How Much is Your Home Worth?" description="Get your instant home valuation. Enter your details to see how much your home is worth."/><section className="container section-sm split-layout valuation-full-layout"><div><ValuationForm initialAddress={address||''} full comps={comps}/></div><aside><p className="eyebrow">From an estimate to a plan</p><h2>Local knowledge.<br/>A clearer picture.</h2><div className="valuation-steps">{[['01','Tell us about home.','Start with your address and a few details.'],['02','See the possibilities.','Explore a range based on comparable sales.'],['03','Get a local perspective.','A personal market analysis adds the details a number can’t.']].map(([n,t,b])=><div key={n}><span>{n}</span><div><h3>{t}</h3><p>{b}</p></div></div>)}</div><ContactDetails/><DemoNote>Demo estimates are illustrative. No address is geocoded without a configured provider; unmatched addresses receive a manual CMA follow-up.</DemoNote></aside></section></>;}

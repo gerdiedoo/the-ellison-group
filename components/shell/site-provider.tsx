@@ -17,8 +17,9 @@ export function SiteProvider({children}:{children:React.ReactNode}) {
     <Dialog.Root open={open} onOpenChange={setOpen}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><Dialog.Content className="drawer"><Dialog.Close className="icon-button drawer-close" aria-label="Close contact drawer"><X/></Dialog.Close><p className="eyebrow">Let's start a conversation</p><Dialog.Title>Leave a Message</Dialog.Title><Dialog.Description className="muted">A home is personal. Your real estate experience should be, too.</Dialog.Description><div id="contact-drawer-form" data-message={message}><ContactFormLoader message={message}/></div><ContactDetails/></Dialog.Content></Dialog.Portal></Dialog.Root>
     {notice&&<div role="status" className="toast"><Check size={18}/>{notice}</div>}
     {consent===null&&<aside className="cookie-banner" aria-label="Cookie preferences"><div><strong>A little privacy, by design.</strong><p>Essential cookies keep your saved homes working. With your permission, analytics help us improve your experience.</p></div><button className="text-link" onClick={()=>choose('essential')}>Essential only</button><button className="button" onClick={()=>choose('all')}>Accept all<Check size={15}/></button></aside>}
-    {isDev&&<span className="dev-badge">DEV {isMock?'· DEMO':''}</span>}
+    <ProgressiveProfileLoader/>{isDev&&<span className="dev-badge">DEV {isMock?'· DEMO':''}</span>}
   </Context.Provider>;
 }
 import dynamic from 'next/dynamic';
 const ContactFormLoader = dynamic(()=>import('@/components/forms/contact-form').then(m=>m.ContactForm),{loading:()=> <p>Loading contact form…</p>});
+const ProgressiveProfileLoader=dynamic(()=>import('@/components/forms/progressive-profile').then(m=>m.ProgressiveProfile),{ssr:false});

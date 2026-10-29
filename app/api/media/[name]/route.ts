@@ -1,0 +1,3 @@
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+export async function GET(_r:Request,{params}:{params:Promise<{name:string}>}){const{name}=await params;if(!/^[0-9a-f-]{36}$/.test(name))return new Response(null,{status:404});try{const dir=path.join(process.cwd(),'.local/media'),data=await readFile(path.join(dir,name)),meta=JSON.parse(await readFile(path.join(dir,`${name}.json`),'utf8')) as {type:string};return new Response(data,{headers:{'Content-Type':meta.type,'X-Content-Type-Options':'nosniff','Cache-Control':'public,max-age=31536000,immutable'}});}catch{return new Response(null,{status:404});}}

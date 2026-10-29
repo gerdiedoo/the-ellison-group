@@ -1,0 +1,2 @@
+import { PageHero,ButtonLink } from '@/components/ui/primitives';
+export default function NotFound(){return <><PageHero eyebrow="A little off the beaten path · 404" title="Let's find your way home." description="That page may have moved, but your next chapter is still out there."/><section className="container section-sm inline-actions"><ButtonLink href="/">Back to home</ButtonLink><ButtonLink href="/home-search/listings" outline>Explore homes</ButtonLink></section></>;}

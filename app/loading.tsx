@@ -1,0 +1,1 @@
+export default function Loading(){return <div className="container page-hero" aria-busy="true" aria-label="Loading page"><div className="loading-skeleton"/><p className="sr-only" role="status">Finding your next chapter…</p></div>;}

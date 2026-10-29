@@ -1,0 +1,3 @@
+'use client';
+import { useEffect,useState } from 'react';
+export function ProgressRail({steps}:{steps:string[]}){const[active,setActive]=useState(0);useEffect(()=>{const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)setActive(Number((e.target as HTMLElement).dataset.step));}),{rootMargin:'-20% 0px -50% 0px'});document.querySelectorAll('[data-step]').forEach(el=>observer.observe(el));return()=>observer.disconnect();},[]);return <nav className="guide-progress" aria-label="Guide steps"><p className="eyebrow">Your guide, step by step</p>{steps.map((s,i)=><a key={s} href={`#step-${i+1}`} className={active===i?'active':''} aria-current={active===i?'step':undefined}><span>{String(i+1).padStart(2,'0')}</span>{s}</a>)}</nav>;}

@@ -1,7 +1,7 @@
 .PHONY: setup dev down logs seed migrate test e2e build-prod up-prod db-reset types
 setup:
 	pnpm install --frozen-lockfile
-	pnpm setup
+	pnpm run setup
 dev: setup
 	pnpm exec supabase start
 	docker compose -f docker-compose.dev.yml up --build -d

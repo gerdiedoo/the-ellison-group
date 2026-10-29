@@ -4,6 +4,8 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { X, ArrowUpRight, Check } from 'lucide-react';
 import { site } from '@/lib/site';
 import { isDev, isMock } from '@/lib/env';
+import { FavoritesSync } from '@/components/portal/favorites-sync';
+import { ConsentAnalytics } from '@/components/analytics';
 const Context = createContext<{openContact:(message?:string)=>void;toast:(message:string)=>void}>({openContact:()=>{},toast:()=>{}});
 export const useSite = () => useContext(Context);
 export function ContactButton({children='Contact Us',className='button',message}:{children?:React.ReactNode;className?:string;message?:string}) { const {openContact}=useSite(); return <button className={className} onClick={()=>openContact(message)}><span>{children}</span><ArrowUpRight size={17} aria-hidden="true"/></button>; }
@@ -13,7 +15,7 @@ export function SiteProvider({children}:{children:React.ReactNode}) {
   useEffect(()=>{setConsent(localStorage.getItem('ellison-consent'));},[]);
   useEffect(()=>{if(!notice)return;const id=setTimeout(()=>setNotice(''),4500);return()=>clearTimeout(id);},[notice]);
   function choose(value:string){localStorage.setItem('ellison-consent',value);setConsent(value);window.dispatchEvent(new Event('consentchange'));}
-  return <Context.Provider value={{openContact:(m='')=>{setMessage(m);setOpen(true);},toast:setNotice}}>{children}
+  return <Context.Provider value={{openContact:(m='')=>{setMessage(m);setOpen(true);},toast:setNotice}}>{children}<FavoritesSync/><ConsentAnalytics/>
     <Dialog.Root open={open} onOpenChange={setOpen}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><Dialog.Content className="drawer"><Dialog.Close className="icon-button drawer-close" aria-label="Close contact drawer"><X/></Dialog.Close><p className="eyebrow">Let's start a conversation</p><Dialog.Title>Leave a Message</Dialog.Title><Dialog.Description className="muted">A home is personal. Your real estate experience should be, too.</Dialog.Description><div id="contact-drawer-form" data-message={message}><ContactFormLoader message={message}/></div><ContactDetails/></Dialog.Content></Dialog.Portal></Dialog.Root>
     {notice&&<div role="status" className="toast"><Check size={18}/>{notice}</div>}
     {consent===null&&<aside className="cookie-banner" aria-label="Cookie preferences"><div><strong>A little privacy, by design.</strong><p>Essential cookies keep your saved homes working. With your permission, analytics help us improve your experience.</p></div><button className="text-link" onClick={()=>choose('essential')}>Essential only</button><button className="button" onClick={()=>choose('all')}>Accept all<Check size={15}/></button></aside>}

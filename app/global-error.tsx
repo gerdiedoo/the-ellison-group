@@ -1,0 +1,2 @@
+'use client';
+export default function GlobalError({reset}:{error:Error;reset:()=>void}){return <html lang="en"><body style={{margin:0,padding:'15vh 24px',background:'#f6f3ee',color:'#14171a',fontFamily:'Arial,sans-serif',textAlign:'center'}}><h1>A brief pause.</h1><p>We couldn't load the site. Please try again in a moment.</p><button style={{padding:'16px 24px',border:'1px solid #8b1e2d',background:'#8b1e2d',color:'#f6f3ee',cursor:'pointer'}} onClick={reset}>Try again</button></body></html>;}

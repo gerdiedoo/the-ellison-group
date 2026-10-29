@@ -1,0 +1,6 @@
+import { PageHero } from '@/components/ui/primitives';
+import { ContactForm } from '@/components/forms/contact-form';
+import { ContactDetails } from '@/components/shell/site-provider';
+import { site } from '@/lib/site';
+export const metadata={title:'Contact | The Ellison Group',alternates:{canonical:'/contact'}};
+export default function Contact(){return <><PageHero eyebrow="A conversation away" title="Let's talk about what's next." description="A home is personal. Your real estate experience should be, too."/><section className="container section-sm split-layout contact-layout"><div><h2>Leave a Message</h2><div className="mt-8"><ContactForm/></div></div><aside><ContactDetails/><p className="eyebrow mt-8">Office hours</p><p>Monday–Friday, 9 AM–5 PM<br/>Appointments available</p><a className="text-link mt-8" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`} target="_blank" rel="noreferrer">Get directions</a><iframe className="office-map" title="The Ellison Group office at 12814 Cantrell Rd, Little Rock" src={`https://maps.google.com/maps?q=${encodeURIComponent(site.address)}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade"/></aside></section></>;}

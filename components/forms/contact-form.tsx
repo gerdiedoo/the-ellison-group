@@ -1,0 +1,2 @@
+'use client';
+export function ContactForm({message=''}:{message?:string}) {return <form className="form" action="/contact"><label>Full name<input name="name" autoComplete="name" required/></label><label>Email<input name="email" type="email" autoComplete="email" required/></label><label>Message<textarea name="message" defaultValue={message}/></label><button className="button">Continue to Contact Us</button></form>;}

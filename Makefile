@@ -13,7 +13,7 @@ logs:
 seed:
 	pnpm seed
 migrate:
-	pnpm exec supabase db push --local
+	pnpm exec supabase migration up --local
 test:
 	docker compose -f docker-compose.dev.yml run --rm web sh -c "pnpm lint && pnpm typecheck && pnpm test"
 e2e:

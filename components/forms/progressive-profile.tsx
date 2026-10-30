@@ -1,6 +1,47 @@
 'use client';
 import * as Dialog from '@radix-ui/react-dialog';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { ContactForm } from './contact-form';
-export function ProgressiveProfile(){const[capture,setCapture]=useState<{email:string;source:string}|null>(null);useEffect(()=>{const listen=(event:Event)=>setCapture((event as CustomEvent<{email:string;source:string}>).detail);window.addEventListener('ellison-progressive',listen);return()=>window.removeEventListener('ellison-progressive',listen);},[]);return <Dialog.Root open={Boolean(capture)} onOpenChange={o=>{if(!o)setCapture(null);}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><Dialog.Content className="modal"><Dialog.Close className="icon-button modal-close" aria-label="Close optional profile"><X size={18}/></Dialog.Close><p className="eyebrow">One more thing, if you'd like</p><Dialog.Title>Thanks, please provide more information to help serve you</Dialog.Title><Dialog.Description className="muted">These details are optional. Your original submission is already saved.</Dialog.Description>{capture&&<ContactForm source="progressive" extra={{email:capture.email,trigger_source:capture.source}} buttonLabel="Save my preferences" onSuccess={()=>setCapture(null)}/>}</Dialog.Content></Dialog.Portal></Dialog.Root>;}
+import dynamic from 'next/dynamic';
+const ContactForm = dynamic(() => import('./contact-form').then((m) => m.ContactForm), {
+  loading: () => <p role="status">Loading contact form…</p>,
+});
+export function ProgressiveProfile() {
+  const [capture, setCapture] = useState<{ email: string; source: string } | null>(null);
+  useEffect(() => {
+    const listen = (event: Event) =>
+      setCapture((event as CustomEvent<{ email: string; source: string }>).detail);
+    window.addEventListener('ellison-progressive', listen);
+    return () => window.removeEventListener('ellison-progressive', listen);
+  }, []);
+  return (
+    <Dialog.Root
+      open={Boolean(capture)}
+      onOpenChange={(o) => {
+        if (!o) setCapture(null);
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Overlay className="dialog-overlay" />
+        <Dialog.Content className="modal">
+          <Dialog.Close className="icon-button modal-close" aria-label="Close optional profile">
+            <X size={18} />
+          </Dialog.Close>
+          <p className="eyebrow">One more thing, if you'd like</p>
+          <Dialog.Title>Thanks, please provide more information to help serve you</Dialog.Title>
+          <Dialog.Description className="muted">
+            These details are optional. Your original submission is already saved.
+          </Dialog.Description>
+          {capture && (
+            <ContactForm
+              source="progressive"
+              extra={{ email: capture.email, trigger_source: capture.source }}
+              buttonLabel="Save my preferences"
+              onSuccess={() => setCapture(null)}
+            />
+          )}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}

@@ -1,19 +1,10 @@
 services:
-  web:
-    build: { context: ., target: runner, args: { NEXT_PUBLIC_APP_ENV: development, NEXT_PUBLIC_DATA_MODE: mock } }
-    environment:
-      NEXT_PUBLIC_APP_ENV: development
-      NEXT_PUBLIC_DATA_MODE: mock
-      AUTH_SECRET: test-only-replace-with-a-long-random-secret
-      DEMO_ADMIN_CODE: prototype-admin
-    ports: ["3000:3000"]
   tests:
     image: mcr.microsoft.com/playwright:v1.56.1-noble
     working_dir: /work
-    volumes: [".:/work", "test_modules:/work/node_modules"]
-    environment: { BASE_URL: "http://web:3000", CI: "true" }
-    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm e2e && pnpm lighthouse"
-    depends_on:
-      web: { condition: service_healthy }
+    volumes: ['.:/work', 'test_modules:/work/node_modules', 'test_next:/work/.next-e2e']
+    environment: { CI: 'true' }
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm e2e"
 volumes:
   test_modules:
+  test_next:

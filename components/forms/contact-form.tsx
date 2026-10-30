@@ -1,18 +1,261 @@
 'use client';
+import { isPhone } from '@/lib/contact-details';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { ArrowUpRight,Check } from 'lucide-react';
-import { leadSchema,type LeadInput,type LeadData } from '@/lib/schemas';
-import { DISCLOSURE,EMAIL_CONSENT,SMS_CONSENT,PROGRESSIVE_CONSENT } from '@/lib/consent';
+import { ArrowUpRight, Check } from 'lucide-react';
+import { leadSchema, type LeadInput, type LeadData } from '@/lib/schemas';
+import { DISCLOSURE, EMAIL_CONSENT, SMS_CONSENT, PROGRESSIVE_CONSENT } from '@/lib/consent';
 import { Turnstile } from './turnstile';
-import type { Valuation,Showing } from '@/lib/types';
-export type LeadResponse={lead_id:string;valuation:Valuation|null;showing:Showing|null};
-export function ContactForm({message='',source='contact',extra={},buttonLabel='Submit',onSuccess}:{message?:string;source?:LeadData['source'];extra?:Partial<LeadInput>;buttonLabel?:string;onSuccess?:(result:LeadResponse)=>void}) {
- const[error,setError]=useState(''),[success,setSuccess]=useState(false),[token,setToken]=useState('');
- const{register,handleSubmit,formState:{errors,isSubmitting}}=useForm<LeadInput,unknown,LeadData>({resolver:zodResolver(leadSchema),defaultValues:{source,message,email_phone:false,sms:false,newsletter:false,website:'',...extra}});
- const submit=async(data:LeadData)=>{setError('');try{const response=await fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,turnstile_token:token})});const result=await response.json() as LeadResponse&{error?:string};if(!response.ok)throw new Error(result.error||'Please check your details.');setSuccess(true);onSuccess?.(result);window.dispatchEvent(new CustomEvent('ellison-analytics',{detail:{event:data.source==='showing'?'showing_scheduled':data.source==='valuation'?'valuation_completed':'lead_submit',source:data.source}}));}catch(e){setError(e instanceof Error?e.message:'Please try again.');}};
- if(success)return <div className="success-panel" role="status"><Check size={30} style={{margin:'auto',color:'var(--success)'}}/><h3>Thank you.</h3><p>{source==='showing'?`Thank you for your interest in ${message.replace('Showing request: ','')}. We are reviewing your request and will be in touch shortly!`:'Thank you for your message. We will be in touch with you shortly.'}</p>{source==='showing'&&<button className="text-link mt-8" onClick={()=>setSuccess(false)}>Change time</button>}</div>;
- return <form className="form" noValidate onSubmit={handleSubmit(submit)}><input type="hidden" {...register('source')}/><input type="hidden" {...register('trigger_source')}/><div className="sr-only" aria-hidden="true"><label>Leave this empty<input {...register('website')} autoComplete="off" tabIndex={-1}/></label></div>{source!=='progressive'&&<><div className="form-row"><label>First name *<input {...register('first_name')} autoComplete="given-name" aria-invalid={Boolean(errors.first_name)}/>{errors.first_name&&<span className="error-text">{errors.first_name.message}</span>}</label><label>Last name<input {...register('last_name')} autoComplete="family-name"/></label></div><label>Middle name (optional)<input {...register('middle_name')} autoComplete="additional-name"/></label><label>Email *<input {...register('email')} type="email" autoComplete="email" aria-invalid={Boolean(errors.email)}/>{errors.email&&<span className="error-text">{errors.email.message}</span>}</label></>}{source==='progressive'&&<><label>Your email<input {...register('email')} readOnly/></label><label>Your name<input {...register('first_name')} autoComplete="given-name"/></label><p className="consent-copy">{PROGRESSIVE_CONSENT}</p></>}<div className="form-row"><label>Phone<input {...register('phone')} type="tel" autoComplete="tel"/>{errors.phone&&<span className="error-text">{errors.phone.message}</span>}</label><label>Interested in…<select {...register('interest')}><option value="">Please select</option>{['Selling & Buying','Selling','Buying','Renting','Other'].map(i=><option key={i}>{i}</option>)}</select></label></div>{source==='valuation'&&<><label>Home address *<input {...register('address')} autoComplete="street-address"/>{errors.address&&<span className="error-text">{errors.address.message}</span>}</label><div className="form-row"><label>Living area (Sq.Ft.)<input type="number" min="1" {...register('sqft')}/></label><label>Property type<select {...register('property_type')}><option>Residential</option><option>Condo</option><option>Townhouse</option></select></label></div><div className="form-row"><label>Bedrooms<input type="number" min="0" max="20" {...register('beds')}/></label><label>Bathrooms<input type="number" min="0" max="20" {...register('baths')}/></label></div></>}{!['progressive','valuation'].includes(source)&&<label>Message<textarea {...register('message')}/></label>}<p className="consent-copy">{DISCLOSURE} <Link href="/terms-and-conditions">Privacy Policy</Link></p><label className="consent"><input type="checkbox" {...register('email_phone')}/><span>{EMAIL_CONSENT}</span></label><label className="consent"><input type="checkbox" {...register('sms')}/><span>{SMS_CONSENT}</span></label><Turnstile onToken={setToken}/><p className="error-text" role="alert">{error}</p><button className="button" disabled={isSubmitting}><span>{isSubmitting?'Sending…':buttonLabel}</span><ArrowUpRight size={17}/></button></form>;
+import type { Valuation, Showing } from '@/lib/types';
+export type LeadResponse = {
+  lead_id: string;
+  valuation: Valuation | null;
+  showing: Showing | null;
+};
+export function ContactForm({
+  message = '',
+  source = 'contact',
+  extra = {},
+  buttonLabel = 'Submit',
+  onSuccess,
+  requiredFields,
+}: {
+  message?: string;
+  source?: LeadData['source'];
+  extra?: Partial<LeadInput>;
+  buttonLabel?: string;
+  onSuccess?: (result: LeadResponse) => void;
+  requiredFields?: ('full_name' | 'email' | 'phone')[];
+}) {
+  const [error, setError] = useState(''),
+    [success, setSuccess] = useState(false),
+    [token, setToken] = useState('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LeadInput, unknown, LeadData>({
+    resolver: zodResolver(
+      leadSchema.superRefine((v, ctx) => {
+        if (
+          (requiredFields ? requiredFields.includes('full_name') : source !== 'newsletter') &&
+          !v.first_name
+        )
+          ctx.addIssue({
+            code: 'custom',
+            path: ['first_name'],
+            message: 'Please enter your name.',
+          });
+        if (requiredFields?.includes('phone') && !isPhone(v.phone))
+          ctx.addIssue({
+            code: 'custom',
+            path: ['phone'],
+            message: 'Please enter a valid phone number.',
+          });
+      }),
+    ),
+    defaultValues: {
+      source,
+      message,
+      email_phone: false,
+      sms: false,
+      newsletter: false,
+      website: '',
+      ...extra,
+    },
+  });
+  const submit = async (data: LeadData) => {
+    setError('');
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          trigger_source: data.trigger_source || window.location.pathname,
+          utm: {
+            ...data.utm,
+            ...Object.fromEntries(
+              [...new URLSearchParams(window.location.search)].filter(([key]) =>
+                ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].includes(
+                  key,
+                ),
+              ),
+            ),
+          },
+          turnstile_token: token,
+        }),
+      });
+      const result = (await response.json()) as LeadResponse & { error?: string };
+      if (!response.ok) throw new Error(result.error || 'Please check your details.');
+      setSuccess(true);
+      onSuccess?.(result);
+      window.dispatchEvent(
+        new CustomEvent('ellison-analytics', {
+          detail: {
+            event:
+              data.source === 'showing'
+                ? 'showing_scheduled'
+                : data.source === 'valuation'
+                  ? 'valuation_completed'
+                  : 'lead_submit',
+            source: data.source,
+          },
+        }),
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Please try again.');
+    }
+  };
+  if (success)
+    return (
+      <div className="success-panel" role="status">
+        <Check size={30} style={{ margin: 'auto', color: 'var(--success)' }} />
+        <h3>Thank you.</h3>
+        <p>
+          {source === 'showing'
+            ? `Thank you for your interest in ${message.replace('Showing request: ', '')}. We are reviewing your request and will be in touch shortly!`
+            : 'Thank you for your message. We will be in touch with you shortly.'}
+        </p>
+        {source === 'showing' && (
+          <button className="text-link mt-8" onClick={() => setSuccess(false)}>
+            Change time
+          </button>
+        )}
+      </div>
+    );
+  return (
+    <form className="form" noValidate onSubmit={handleSubmit(submit)}>
+      <input type="hidden" {...register('source')} />
+      <input type="hidden" {...register('trigger_source')} />
+      <div className="sr-only" aria-hidden="true">
+        <label>
+          Leave this empty
+          <input {...register('website')} autoComplete="off" tabIndex={-1} />
+        </label>
+      </div>
+      {source !== 'progressive' && (
+        <>
+          <div className="form-row">
+            <label>
+              First name{' '}
+              {requiredFields && !requiredFields.includes('full_name') ? '(optional)' : '*'}
+              <input
+                {...register('first_name')}
+                autoComplete="given-name"
+                aria-invalid={Boolean(errors.first_name)}
+              />
+              {errors.first_name && <span className="error-text">{errors.first_name.message}</span>}
+            </label>
+            <label>
+              Last name
+              <input {...register('last_name')} autoComplete="family-name" />
+            </label>
+          </div>
+          <label>
+            Middle name (optional)
+            <input {...register('middle_name')} autoComplete="additional-name" />
+          </label>
+          <label>
+            Email *
+            <input
+              {...register('email')}
+              type="email"
+              autoComplete="email"
+              aria-invalid={Boolean(errors.email)}
+            />
+            {errors.email && <span className="error-text">{errors.email.message}</span>}
+          </label>
+        </>
+      )}
+      {source === 'progressive' && (
+        <>
+          <label>
+            Your email
+            <input {...register('email')} readOnly />
+          </label>
+          <label>
+            Your name
+            <input {...register('first_name')} autoComplete="given-name" />
+          </label>
+          <p className="consent-copy">{PROGRESSIVE_CONSENT}</p>
+        </>
+      )}
+      <div className="form-row">
+        <label>
+          Phone
+          <input {...register('phone')} type="tel" autoComplete="tel" />
+          {errors.phone && <span className="error-text">{errors.phone.message}</span>}
+        </label>
+        <label>
+          Interested in…
+          <select {...register('interest')}>
+            <option value="">Please select</option>
+            {['Selling & Buying', 'Selling', 'Buying', 'Renting', 'Other'].map((i) => (
+              <option key={i}>{i}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {source === 'valuation' && (
+        <>
+          <label>
+            Home address *<input {...register('address')} autoComplete="street-address" />
+            {errors.address && <span className="error-text">{errors.address.message}</span>}
+          </label>
+          <div className="form-row">
+            <label>
+              Living area (Sq.Ft.)
+              <input type="number" min="1" {...register('sqft')} />
+            </label>
+            <label>
+              Property type
+              <select {...register('property_type')}>
+                <option>Residential</option>
+                <option>Condo</option>
+                <option>Townhouse</option>
+              </select>
+            </label>
+          </div>
+          <div className="form-row">
+            <label>
+              Bedrooms
+              <input type="number" min="0" max="20" {...register('beds')} />
+            </label>
+            <label>
+              Bathrooms
+              <input type="number" min="0" max="20" {...register('baths')} />
+            </label>
+          </div>
+        </>
+      )}
+      {!['progressive', 'valuation'].includes(source) && (
+        <label>
+          Message
+          <textarea {...register('message')} />
+        </label>
+      )}
+      <p className="consent-copy">
+        {DISCLOSURE} <Link href="/terms-and-conditions">Privacy Policy</Link>
+      </p>
+      <label className="consent">
+        <input type="checkbox" {...register('email_phone')} />
+        <span>{EMAIL_CONSENT}</span>
+      </label>
+      <label className="consent">
+        <input type="checkbox" {...register('sms')} />
+        <span>{SMS_CONSENT}</span>
+      </label>
+      <Turnstile onToken={setToken} />
+      <p className="error-text" role="alert">
+        {error}
+      </p>
+      <button className="button" disabled={isSubmitting}>
+        <span>{isSubmitting ? 'Sending…' : buttonLabel}</span>
+        <ArrowUpRight size={17} />
+      </button>
+    </form>
+  );
 }

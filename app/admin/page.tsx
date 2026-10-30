@@ -1,4 +1,8 @@
-import Link from 'next/link';
 import { currentUser } from '@/lib/auth';
-import { all } from '@/lib/repository';
-export default async function Dashboard(){const user=await currentUser();if(!user||!['agent','admin'].includes(user.role))return null;const[leads,listings,outbox]=await Promise.all([all('leads',true),all('listings',true),all('dev_outbox',true)]);return <><h2>Every conversation starts here.</h2><div className="dashboard-stats">{[[leads.filter(l=>l.status==='new').length,'New inquiries','/admin/leads'],[listings.filter(l=>l.is_featured).length,'Featured listings','/admin/listings'],[outbox.filter(o=>!o.sent_at).length,'Queued messages','/admin/dev_outbox']].map(([value,label,href])=><Link href={String(href)} key={label}><strong>{value}</strong><span>{label}</span></Link>)}</div><h3 className="mt-8">Recent inquiries</h3><div className="table-wrap mt-8"><table><thead><tr><th>Name</th><th>Source</th><th>Status</th><th>Received</th></tr></thead><tbody>{leads.slice(-8).reverse().map(l=><tr key={l.id}><td>{l.first_name||l.email}</td><td>{l.source}</td><td>{l.status}</td><td>{l.created_at.slice(0,10)}</td></tr>)}</tbody></table></div></>;}
+import { platformSnapshot } from '@/lib/platform/snapshot';
+import { AnalyticsDashboard } from '@/components/admin/analytics-dashboard';
+export default async function Dashboard() {
+  const user = await currentUser();
+  if (!user || !['agent', 'admin'].includes(user.role)) return null;
+  return <AnalyticsDashboard data={await platformSnapshot(user)} overview />;
+}

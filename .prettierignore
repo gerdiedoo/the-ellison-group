@@ -1,5 +1,8 @@
 node_modules
 .next
+.next-e2e
+.next-build
+.lighthouseci
 pnpm-lock.yaml
 public
 .local

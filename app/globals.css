@@ -335,14 +335,24 @@ legend {
 .header-hidden {
   transform: translateY(-100%);
 }
+.header-hidden:has(:focus-visible) {
+  transform: translateY(0);
+}
 .header-inner {
   width: calc(100% - 80px);
   margin: auto;
   height: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 26px;
   justify-content: space-between;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 26px;
 }
 .brand-lockup {
   display: inline-flex;
@@ -391,8 +401,8 @@ legend {
 .desktop-nav {
   display: flex;
   align-items: center;
-  gap: 25px;
-  font-size: 10px;
+  gap: 22px;
+  font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -408,7 +418,7 @@ legend {
   width: 12px;
 }
 .header-phone {
-  font-size: 11px;
+  font-size: 12px;
   display: flex;
   gap: 9px;
   align-items: center;
@@ -589,6 +599,10 @@ legend {
   gap: 25px;
   box-shadow: 0 4px 50px #14171a15;
 }
+.cookie-banner > div {
+  flex: 1;
+  min-width: 0;
+}
 .cookie-banner strong {
   font-size: 12px;
 }
@@ -599,6 +613,7 @@ legend {
   margin-top: 5px;
 }
 .cookie-banner .button {
+  flex-shrink: 0;
   font-size: 9px;
   min-height: 44px;
   padding: 10px 18px;
@@ -996,6 +1011,14 @@ td {
     padding-block: 95px;
   }
 }
+@media (max-width: 1100px) {
+  .header-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .desktop-nav {
+    display: none;
+  }
+}
 @media (max-width: 960px) {
   .desktop-nav {
     display: none;
@@ -1033,6 +1056,7 @@ td {
     gap: 12px 25px;
   }
   .cookie-banner > div {
+    flex-basis: 100%;
     width: 100%;
   }
   .cookie-banner .text-link {

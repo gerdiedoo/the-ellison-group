@@ -1,3 +1,138 @@
-.valuation-full-layout{padding-top:0;align-items:start;gap:100px;padding-bottom:100px}.valuation-full-layout .valuation-entry{margin-top:0}.valuation-full-layout aside{padding:40px;background:var(--sand);position:sticky;top:110px}.valuation-full-layout aside h2{font-size:40px}.valuation-steps{margin-block:35px 45px}.valuation-steps>div{display:flex;gap:20px;padding-block:25px;border-bottom:1px solid #14171a20}.valuation-steps>div>span{font-size:10px;color:var(--accent);padding-top:5px}.valuation-steps h3{font-size:25px;letter-spacing:-.03em}.valuation-steps p{font-size:11px;color:var(--muted);margin-top:10px}.valuation-result.has-result{padding:30px;background:var(--sand)}.valuation-result h3{font-size:35px}.valuation-result p:not(.eyebrow){margin-top:20px}.valuation-result .valuation-range{font-size:clamp(25px,3vw,40px);font-family:var(--font-fraunces);font-variant-numeric:tabular-nums;letter-spacing:-.04em}.valuation-result .listing-grid{grid-template-columns:1fr}.valuation-result .listing-info h3{font-size:27px}
-@media(max-width:960px){.valuation-full-layout{gap:40px}.valuation-full-layout aside{padding:25px}}
-@media(max-width:700px){.valuation-full-layout{grid-template-columns:1fr}.valuation-full-layout aside{position:static}.valuation-result.has-result{padding:24px}}
+.valuation-full-layout {
+  padding-top: 0;
+  align-items: start;
+  gap: 100px;
+  padding-bottom: 100px;
+}
+.valuation-full-layout .valuation-entry {
+  margin-top: 0;
+}
+.valuation-full-layout aside {
+  padding: 40px;
+  background: var(--sand);
+  position: sticky;
+  top: 110px;
+}
+.valuation-full-layout aside h2 {
+  font-size: 40px;
+}
+.valuation-steps {
+  margin-block: 35px 45px;
+}
+.valuation-steps > div {
+  display: flex;
+  gap: 20px;
+  padding-block: 25px;
+  border-bottom: 1px solid #14171a20;
+}
+.valuation-steps > div > span {
+  font-size: 10px;
+  color: var(--accent);
+  padding-top: 5px;
+}
+.valuation-steps h3 {
+  font-size: 25px;
+  letter-spacing: -0.03em;
+}
+.valuation-steps p {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+.valuation-result.has-result {
+  padding: 30px;
+  background: var(--sand);
+}
+.valuation-result h3 {
+  font-size: 35px;
+}
+.valuation-result p:not(.eyebrow) {
+  margin-top: 20px;
+}
+.valuation-result .valuation-range {
+  font-size: clamp(25px, 3vw, 40px);
+  font-family: var(--font-fraunces);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+.valuation-result .listing-grid {
+  grid-template-columns: 1fr;
+}
+.valuation-result .listing-info h3 {
+  font-size: 27px;
+}
+@media (max-width: 960px) {
+  .valuation-full-layout {
+    gap: 40px;
+  }
+  .valuation-full-layout aside {
+    padding: 25px;
+  }
+}
+@media (max-width: 700px) {
+  .valuation-full-layout {
+    grid-template-columns: 1fr;
+  }
+  .valuation-full-layout aside {
+    position: static;
+  }
+  .valuation-result.has-result {
+    padding: 24px;
+  }
+}
+
+.valuation-education {
+  background: var(--sand);
+  padding-block: 85px;
+}
+.valuation-importance {
+  padding-block: 85px 100px;
+}
+.valuation-education h2,
+.valuation-importance h2 {
+  font-size: clamp(32px, 4vw, 48px);
+  max-width: 750px;
+}
+.valuation-education-intro {
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 600px;
+}
+.valuation-education-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 45px 70px;
+  margin-top: 45px;
+}
+.valuation-education-grid article {
+  border-top: 1px solid var(--line);
+  padding-top: 25px;
+}
+.valuation-education-grid article > span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+.valuation-education-grid h3 {
+  font-size: 29px;
+  margin-block: 16px;
+}
+.valuation-education-grid p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+  max-width: 490px;
+}
+@media (max-width: 700px) {
+  .valuation-education,
+  .valuation-importance {
+    padding-block: 60px;
+  }
+  .valuation-education-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 30px;
+  }
+}

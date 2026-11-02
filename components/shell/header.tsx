@@ -36,11 +36,18 @@ export function Header() {
   useEffect(() => {
     let last = window.scrollY;
     const update = () => {
-      const y = window.scrollY;
+      const y = Math.max(0, window.scrollY);
       setScrolled(y > 70);
-      setHidden(y > 350 && y > last && y - last > 3);
+      if (y <= 100) {
+        setHidden(false);
+      } else if (Math.abs(y - last) < 5) {
+        return;
+      } else {
+        setHidden(y > last);
+      }
       last = y;
     };
+    update();
     window.addEventListener('scroll', update, { passive: true });
     return () => window.removeEventListener('scroll', update);
   }, []);
@@ -84,38 +91,40 @@ export function Header() {
           <Link href="/neighborhoods">Neighborhoods</Link>
           <ContactButton className="nav-button" />
         </nav>
-        <a className="header-phone" href={site.phone_href}>
-          <Phone size={13} />
-          {site.phone}
-        </a>
-        <Dialog.Root open={menu} onOpenChange={setMenu}>
-          <Dialog.Trigger className="icon-button menu-button" aria-label="Open full menu">
-            <Menu size={22} />
-          </Dialog.Trigger>
-          <Dialog.Portal>
-            <Dialog.Overlay className="dialog-overlay" />
-            <Dialog.Content className="full-menu">
-              <div className="menu-top">
-                <Wordmark />
-                <Dialog.Close className="icon-button" aria-label="Close menu">
-                  <X />
-                </Dialog.Close>
-              </div>
-              <Dialog.Title className="sr-only">Explore The Ellison Group</Dialog.Title>
-              <Dialog.Description className="sr-only">All pages and resources</Dialog.Description>
-              <nav className="menu-grid" aria-label="Full menu">
-                {navigation.map(([name, url], i) => (
-                  <Link key={url} href={url}>
-                    <span className="menu-index">{String(i + 1).padStart(2, '0')}</span>
-                    {name}
-                    <ArrowUpRight size={22} />
-                  </Link>
-                ))}
-              </nav>
-              <p className="eyebrow">Rooted in Little Rock. Built around you.</p>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <div className="header-actions">
+          <a className="header-phone" href={site.phone_href}>
+            <Phone size={13} />
+            {site.phone}
+          </a>
+          <Dialog.Root open={menu} onOpenChange={setMenu}>
+            <Dialog.Trigger className="icon-button menu-button" aria-label="Open full menu">
+              <Menu size={22} />
+            </Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Overlay className="dialog-overlay" />
+              <Dialog.Content className="full-menu">
+                <div className="menu-top">
+                  <Wordmark />
+                  <Dialog.Close className="icon-button" aria-label="Close menu">
+                    <X />
+                  </Dialog.Close>
+                </div>
+                <Dialog.Title className="sr-only">Explore The Ellison Group</Dialog.Title>
+                <Dialog.Description className="sr-only">All pages and resources</Dialog.Description>
+                <nav className="menu-grid" aria-label="Full menu">
+                  {navigation.map(([name, url], i) => (
+                    <Link key={url} href={url}>
+                      <span className="menu-index">{String(i + 1).padStart(2, '0')}</span>
+                      {name}
+                      <ArrowUpRight size={22} />
+                    </Link>
+                  ))}
+                </nav>
+                <p className="eyebrow">Rooted in Little Rock. Built around you.</p>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
+        </div>
       </div>
     </header>
   );

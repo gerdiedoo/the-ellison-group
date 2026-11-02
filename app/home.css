@@ -697,6 +697,7 @@
   gap: 22px;
 }
 .neighborhood-card {
+  display: block;
   position: relative;
   aspect-ratio: 1.25;
   overflow: hidden;

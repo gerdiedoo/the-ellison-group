@@ -2,13 +2,17 @@ import 'server-only';
 import { cache } from 'react';
 import { all } from '@/lib/repository';
 import { publicListingRecords } from '@/lib/platform/capture';
+import { withTeamPortrait } from '@/lib/agent-photos';
 export const getListings = cache(async () =>
   publicListingRecords(
     (await all('listings', true)).filter((l) => !l.hidden && l.publication_status === 'published'),
   ),
 );
 export const getAgents = cache(async () =>
-  (await all('agents')).filter((a) => a.is_active).sort((a, b) => a.sort_order - b.sort_order),
+  (await all('agents'))
+    .filter((a) => a.is_active)
+    .map(withTeamPortrait)
+    .sort((a, b) => a.sort_order - b.sort_order),
 );
 export const getNeighborhoods = cache(async () =>
   (await all('neighborhoods')).sort((a, b) => a.sort_order - b.sort_order),

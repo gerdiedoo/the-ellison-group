@@ -11,12 +11,17 @@ import { SectionHeading, DemoNote, TextLink } from '@/components/ui/primitives';
 import { money, number } from '@/lib/utils';
 import { getAgents, getNeighborhoods, getListings } from '@/lib/data';
 import { env } from '@/lib/env';
+import { all as getRecords } from '@/lib/repository';
+import { PropertyOverview, PropertyOpenHouses, PropertySchools } from './property-insights';
+import { PropertyHistory, PropertyCommute } from './property-tools';
+import { calculateMortgage } from '@/lib/mortgage';
 import type { Listing } from '@/lib/types';
 export async function PropertyDetail({ listing: l }: { listing: Listing }) {
-  const [agents, neighborhoods, all] = await Promise.all([
+  const [agents, neighborhoods, all, schools] = await Promise.all([
     getAgents(),
     getNeighborhoods(),
     getListings(),
+    getRecords('schools'),
   ]);
   const agent = agents.find((a) => a.id === l.listing_agent_id) || agents[0],
     n = neighborhoods.find((n) => n.id === l.neighborhood_id);
@@ -30,6 +35,51 @@ export async function PropertyDetail({ listing: l }: { listing: Listing }) {
         x.list_price <= l.list_price * 1.3,
     )
     .slice(0, 3);
+  const annualTax = Number(l.raw.property_tax) || 0;
+  const monthlyHoa = Number(l.raw.hoa) || 0;
+  const estimatedPayment = calculateMortgage({
+    price: l.list_price,
+    downPercent: 20,
+    years: 30,
+    rate: 6.5,
+    annualTax,
+    hoa: monthlyHoa,
+    annualInsurance: 0,
+    monthlyPmi: 0,
+  }).total;
+  const compareHomes = all
+    .filter(
+      (home) => home.id !== l.id && home.status !== 'sold' && home.listing_kind === l.listing_kind,
+    )
+    .map(
+      ({
+        id,
+        slug,
+        address_line,
+        list_price,
+        listing_kind,
+        property_type,
+        beds,
+        baths_full,
+        baths_half,
+        living_sqft,
+        lot_acres,
+        year_built,
+      }) => ({
+        id,
+        slug,
+        address_line,
+        list_price,
+        listing_kind,
+        property_type,
+        beds,
+        baths_full,
+        baths_half,
+        living_sqft,
+        lot_acres,
+        year_built,
+      }),
+    );
   return (
     <article className="property-detail" data-listing-id={l.id}>
       <div className="container">
@@ -64,6 +114,12 @@ export async function PropertyDetail({ listing: l }: { listing: Listing }) {
               {money(l.status === 'sold' && l.sold_price ? l.sold_price : l.list_price)}
               {l.listing_kind === 'rent' ? ' / month' : ''}
             </p>
+            {l.listing_kind === 'sale' && l.status !== 'sold' && (
+              <a className="property-payment-link" href="#mortgage">
+                Estimated payment {money(estimatedPayment)} / mo{' '}
+                <span>Before insurance · customize estimate</span>
+              </a>
+            )}
             <div className="inline-actions">
               <Share title={`${l.address_line} | The Ellison Group`} />
               <div className="save-detail">
@@ -74,6 +130,15 @@ export async function PropertyDetail({ listing: l }: { listing: Listing }) {
           </div>
         </header>
         <DemoNote />
+        <nav className="property-section-nav" aria-label="Property sections">
+          <a href="#property-overview">Overview</a>
+          <a href="#property-features">Features</a>
+          <a href="#property-open-houses">Open houses</a>
+          {l.listing_kind === 'sale' && <a href="#mortgage">Monthly payment</a>}
+          <a href="#property-history">Price & tax</a>
+          <a href="#property-schools">Schools</a>
+          <a href="#property-commute">Commute</a>
+        </nav>
         <div className="property-main-layout">
           <div>
             <div className="property-stats">
@@ -110,7 +175,8 @@ export async function PropertyDetail({ listing: l }: { listing: Listing }) {
                 <p>{l.description}</p>
               </details>
             </section>
-            <section className="features-section">
+            <PropertyOverview listing={l} homes={compareHomes} />
+            <section className="features-section" id="property-features">
               <h2>Features & Amenities</h2>
               {(['interior', 'area_lot', 'exterior', 'financial'] as const).map((group, i) => (
                 <details className="feature-accordion" key={group} open={i === 0}>
@@ -141,21 +207,27 @@ export async function PropertyDetail({ listing: l }: { listing: Listing }) {
                 </details>
               ))}
             </section>
+            <PropertyOpenHouses listing={l} />
             <ShowingScheduler listingId={l.id} address={l.address_line} />
             {l.listing_kind === 'sale' && (
-              <MortgageCalculator price={l.list_price} tax={Number(l.raw.property_tax) || 0} />
+              <MortgageCalculator
+                key={l.id}
+                price={l.list_price}
+                tax={annualTax}
+                hoa={monthlyHoa}
+              />
             )}
+            <PropertyHistory listing={l} annualTax={annualTax} />
+            <PropertySchools
+              schools={schools.filter((school) => school.neighborhood_id === l.neighborhood_id)}
+              listing={l}
+            />
+            <PropertyCommute address={`${l.address_line}, ${l.city}, ${l.state} ${l.zip}`} />
           </div>
           {agent && (
             <aside className="property-agent">
               <div className="property-agent-photo">
-                <Image
-                  src={agent.photo_path}
-                  alt={`Sample portrait representing ${agent.full_name}`}
-                  fill
-                  sizes="300px"
-                />
-                <span className="sample-caption">Sample portrait</span>
+                <Image src={agent.photo_path} alt={agent.full_name} fill sizes="300px" />
               </div>
               <p className="eyebrow">Your local connection</p>
               <h3>{agent.full_name}</h3>

@@ -124,11 +124,10 @@ async function HomeSections() {
             <div className="featured-agent-photo">
               <Image
                 src={kerry.photo_path}
-                alt="Sample portrait; Kerry Ellison's approved photography is pending"
+                alt="Kerry Ellison"
                 fill
                 sizes="(max-width:600px) 100vw,40vw"
               />
-              <span className="sample-caption">Sample portrait · official photography pending</span>
             </div>
             <div className="featured-agent-copy">
               <p className="eyebrow">Experience you can feel at home with</p>
@@ -216,8 +215,8 @@ async function HomeSections() {
             <div className="valuation-agent-top">
               <div>
                 <Image
-                  src={kerry?.photo_path || '/seed/portrait-1.jpg'}
-                  alt="Sample agent portrait"
+                  src={kerry?.photo_path || '/team/kerry.avif'}
+                  alt="Kerry Ellison"
                   fill
                   sizes="100px"
                 />

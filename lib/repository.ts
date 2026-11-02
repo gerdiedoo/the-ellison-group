@@ -8,12 +8,9 @@ import { isMock } from '@/lib/env';
 import type { Store, TableName, Tables, Base } from '@/lib/types';
 import { serverClient, serviceClient } from '@/lib/supabase/server';
 import { normalizeStore } from '@/lib/platform/defaults';
-const localRoot = path.join(process.cwd(), '.local'),
-  filename = process.env.MOCK_DATA_FILE
-    ? path.resolve(process.cwd(), process.env.MOCK_DATA_FILE)
-    : path.join(localRoot, 'data.json');
-if (!filename.startsWith(`${localRoot}${path.sep}`))
-  throw new Error('MOCK_DATA_FILE must stay inside the workspace .local directory.');
+import { isVercelDemoPreview } from '@/lib/preview-demo';
+import { mockStorePath } from '@/lib/mock-store-path';
+const filename = mockStorePath(process.cwd(), isVercelDemoPreview, process.env.MOCK_DATA_FILE);
 let queue: Promise<unknown> = Promise.resolve();
 // Mock mode only: synchronous reads keep raw private JSON out of React's development
 // I/O promise debugging payload. Production uses the scoped Supabase boundary.

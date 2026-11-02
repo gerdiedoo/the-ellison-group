@@ -5,6 +5,7 @@ import { COOKIE, signSession, currentUser } from '@/lib/auth';
 import { base, mutateStore } from '@/lib/repository';
 import { guard, body, apiError, ApiError, checkBot } from '@/lib/security';
 import { serverClient } from '@/lib/supabase/server';
+import { isVercelDemoPreview } from '@/lib/preview-demo';
 const schema = z.object({
   action: z.enum(['login', 'logout', 'google']),
   email: z
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
           throw new ApiError(403, 'The team access code is required for this demo account.');
         return p;
       });
-      jar.set(COOKIE, signSession(user.id), {
+      jar.set(COOKIE, signSession(user.id, isVercelDemoPreview ? user : undefined), {
         httpOnly: true,
         secure: new URL(request.url).protocol === 'https:',
         sameSite: 'lax',

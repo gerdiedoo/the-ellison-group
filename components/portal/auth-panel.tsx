@@ -3,4 +3,108 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { isMock } from '@/lib/env';
 import { Turnstile } from '@/components/forms/turnstile';
-export function AuthPanel({admin=false}:{admin?:boolean}){const[status,setStatus]=useState(''),[busy,setBusy]=useState(false),[token,setToken]=useState('');const router=useRouter();async function login(input:Record<string,unknown>){setBusy(true);setStatus('');try{const response=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...input,turnstile_token:token})});const data=await response.json() as {error?:string;message?:string;demo?:boolean;url?:string};if(!response.ok)throw new Error(data.error);if(data.url){window.location.href=data.url;return;}if(data.demo){const homes=JSON.parse(localStorage.getItem('ellison-homes')||'[]') as string[];await Promise.all(homes.map(listing_id=>fetch('/api/portal/homes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({listing_id,saved:true})})));router.refresh();}else setStatus(data.message||'Check your email for a secure sign-in link.');}catch(e){setStatus(e instanceof Error?e.message:'Please try again.');}finally{setBusy(false);}}return <div className="auth-panel"><p className="eyebrow">{admin?'For the people behind every move':'A search that feels like yours'}</p><h2>{admin?'Team access':'Welcome home.'}</h2><p className="muted">{isMock?'Try the prototype with a demo account. No email or SMS will be sent.':'Sign in securely with an email magic link or your Google account.'}</p><form className="form mt-8" onSubmit={e=>{e.preventDefault();const form=new FormData(e.currentTarget);void login({action:'login',email:form.get('email'),...(admin?{code:form.get('code')}:{})});}}><label>Email address<input name="email" type="email" required placeholder={isMock?'demo@example.com':'you@example.com'} autoComplete="email"/></label>{admin&&isMock&&<label>Demo team access code<input name="code" type="password" required autoComplete="off"/><span className="demo-note">Local setup code is in .env.development. This is a demo login, not a live identity provider.</span></label>}<Turnstile onToken={setToken}/><button className="button" disabled={busy}>{busy?'Signing in…':isMock?'Try the demo portal':'Email me a magic link'}</button>{!isMock&&<button type="button" className="button button-outline" disabled={busy} onClick={()=>login({action:'google'})}>Continue with Google</button>}<p role="status">{status}</p></form></div>;}
+export function AuthPanel({ admin = false }: { admin?: boolean }) {
+  const [status, setStatus] = useState(''),
+    [busy, setBusy] = useState(false),
+    [token, setToken] = useState('');
+  const router = useRouter();
+  async function login(input: Record<string, unknown>) {
+    setBusy(true);
+    setStatus('');
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...input, turnstile_token: token }),
+      });
+      const data = (await response.json()) as {
+        error?: string;
+        message?: string;
+        demo?: boolean;
+        url?: string;
+      };
+      if (!response.ok) throw new Error(data.error);
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      if (data.demo) {
+        const homes = JSON.parse(localStorage.getItem('ellison-homes') || '[]') as string[];
+        await Promise.all(
+          homes.map((listing_id) =>
+            fetch('/api/portal/homes', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ listing_id, saved: true }),
+            }),
+          ),
+        );
+        router.refresh();
+      } else setStatus(data.message || 'Check your email for a secure sign-in link.');
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : 'Please try again.');
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="auth-panel">
+      <p className="eyebrow">
+        {admin ? 'For the people behind every move' : 'A search that feels like yours'}
+      </p>
+      <h2>{admin ? 'Team access' : 'Welcome home.'}</h2>
+      <p className="muted">
+        {isMock
+          ? 'Try the prototype with a demo account. No email or SMS will be sent.'
+          : 'Sign in securely with an email magic link or your Google account.'}
+      </p>
+      <form
+        className="form mt-8"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const form = new FormData(e.currentTarget);
+          void login({
+            action: 'login',
+            email: form.get('email'),
+            ...(admin ? { code: form.get('code') } : {}),
+          });
+        }}
+      >
+        <label>
+          Email address
+          <input
+            name="email"
+            type="email"
+            required
+            placeholder={isMock ? 'demo@example.com' : 'you@example.com'}
+            autoComplete="email"
+          />
+        </label>
+        {admin && isMock && (
+          <label>
+            Demo team access code
+            <input name="code" type="password" required autoComplete="off" />
+            <span className="demo-note">
+              Use the team access code provided by your site administrator. This is a demo login.
+            </span>
+          </label>
+        )}
+        <Turnstile onToken={setToken} />
+        <button className="button" disabled={busy}>
+          {busy ? 'Signing in…' : isMock ? 'Try the demo portal' : 'Email me a magic link'}
+        </button>
+        {!isMock && (
+          <button
+            type="button"
+            className="button button-outline"
+            disabled={busy}
+            onClick={() => login({ action: 'google' })}
+          >
+            Continue with Google
+          </button>
+        )}
+        <p role="status">{status}</p>
+      </form>
+    </div>
+  );
+}

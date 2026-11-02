@@ -4,6 +4,7 @@ import { currentUser } from '@/lib/auth';
 import { PageHero } from '@/components/ui/primitives';
 import { AuthPanel } from '@/components/portal/auth-panel';
 import { AdminFrame } from '@/components/admin/frame';
+import { isVercelDemoPreview } from '@/lib/preview-demo';
 export const metadata = {
   title: 'Team Dashboard | The Ellison Group',
   robots: { index: false, follow: false },
@@ -40,5 +41,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       </>
     );
-  return <AdminFrame user={user}>{children}</AdminFrame>;
+  return (
+    <AdminFrame user={user}>
+      {isVercelDemoPreview && (
+        <p className="demo-note">
+          Preview demo: changes are temporary and may reset when the preview restarts.
+        </p>
+      )}
+      {children}
+    </AdminFrame>
+  );
 }

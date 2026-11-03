@@ -30,6 +30,8 @@ For a local demo administrator, enter an email and the `DEMO_ADMIN_CODE` in `.en
 
 Missing AI credentials produce a clearly labeled unavailable state while visitor questions remain available for human follow-up. Google, live email, and SMS require their respective providers. See [integration setup and limitations](TODO-INTEGRATIONS.md).
 
+First-time public visitors see a dismissible listing-update signup with kitchen photography. It appears once per browser (`ellison-welcome-v1` in local storage); returning signed-out visitors receive a sign-in recommendation after eight seconds. Dismissing that recommendation lasts for the tab session. Signed-in visitors, team pages, sign-in pages, and the privacy page skip these prompts. Google sign-in uses the existing configured Supabase provider and returns visitors to their current page; unconfigured/demo mode offers the search portal with a disabled Google button. The signup records email newsletter consent only and does not subscribe visitors to phone calls or SMS.
+
 ## Use local Supabase
 
 Docker Desktop must be running. Start the app's existing Supabase project and apply migrations:

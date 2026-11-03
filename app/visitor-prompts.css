@@ -1,0 +1,238 @@
+.welcome-overlay {
+  background: rgb(0 0 0 / 82%);
+  backdrop-filter: blur(2px);
+}
+.welcome-dialog {
+  position: fixed;
+  z-index: 81;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(1500px, 94vw);
+  height: min(760px, 86dvh);
+  overflow: auto;
+  background: #fff;
+  box-shadow: 0 24px 100px rgb(0 0 0 / 25%);
+}
+.welcome-photo {
+  position: relative;
+  min-height: 100%;
+}
+.welcome-photo img {
+  object-fit: cover;
+}
+.welcome-copy {
+  position: relative;
+  align-self: center;
+  padding: 70px clamp(30px, 6vw, 110px);
+}
+.welcome-close {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  background: #fff;
+}
+.welcome-copy h2 {
+  font-size: clamp(28px, 2.7vw, 44px);
+  line-height: 1.2;
+  margin-bottom: 28px;
+}
+.welcome-copy h2:focus {
+  outline: none;
+}
+.welcome-copy > p:not(.welcome-portal-link) {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(17px, 1.5vw, 23px);
+  line-height: 1.65;
+}
+.welcome-signup {
+  margin-top: 38px;
+  display: grid;
+  gap: 20px;
+}
+.welcome-email input {
+  border: 0;
+  border-bottom: 1px solid #9a948a;
+  border-radius: 0;
+  background: transparent;
+  padding: 10px 0;
+  width: 100%;
+}
+.welcome-signup .consent {
+  align-items: start;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.welcome-signup .consent input {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.welcome-signup .consent a {
+  text-decoration: underline;
+}
+.welcome-submit {
+  justify-self: start;
+  min-width: 155px;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.welcome-submit:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.welcome-portal-link {
+  margin-top: 25px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.welcome-portal-link a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.welcome-success {
+  margin-top: 30px;
+  display: grid;
+  gap: 12px;
+}
+.welcome-success svg {
+  color: var(--success);
+}
+.welcome-success h3 {
+  font-size: 27px;
+}
+.welcome-success p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.sign-in-reminder {
+  position: fixed;
+  z-index: 65;
+  top: 115px;
+  right: 24px;
+  width: min(355px, calc(100vw - 32px));
+  padding: 30px 25px 24px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 45px rgb(20 23 26 / 14%);
+}
+.sign-in-reminder-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+.sign-in-reminder .eyebrow {
+  font-size: 9px;
+  margin-bottom: 12px;
+}
+.sign-in-reminder h2 {
+  font-size: 25px;
+  line-height: 1.25;
+  margin-bottom: 12px;
+}
+.sign-in-reminder > p:not(.eyebrow) {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.google-sign-in {
+  display: grid;
+  gap: 10px;
+}
+.google-sign-in-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 15px;
+  font-size: 13px;
+  background: #fff;
+  border: 1px solid #b4b4b4;
+  border-radius: 4px;
+  color: #1f1f1f;
+}
+.google-sign-in-button:hover:enabled {
+  background: #f6f8fc;
+  border-color: #747775;
+}
+.google-sign-in-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+.sign-in-note {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.sign-in-portal-link {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 11px;
+}
+@media (max-width: 1000px) {
+  .welcome-copy {
+    padding: 55px 35px 35px;
+  }
+  .welcome-signup {
+    margin-top: 25px;
+    gap: 16px;
+  }
+}
+@media (max-width: 700px) {
+  .welcome-dialog {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: 90dvh;
+    width: calc(100vw - 32px);
+  }
+  .welcome-photo {
+    height: 175px;
+    min-height: 0;
+  }
+  .welcome-photo img {
+    object-position: center 52%;
+  }
+  .welcome-copy {
+    padding: 30px 24px;
+  }
+  .welcome-copy h2 {
+    margin-bottom: 16px;
+  }
+  .welcome-copy > p:not(.welcome-portal-link) {
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .welcome-close {
+    top: 8px;
+    right: 8px;
+  }
+  .sign-in-reminder {
+    top: 95px;
+    right: 16px;
+  }
+}
+@media (max-height: 600px) and (min-width: 701px) {
+  .welcome-dialog {
+    align-items: stretch;
+  }
+  .welcome-copy {
+    padding: 40px 30px;
+  }
+  .welcome-photo {
+    position: sticky;
+    top: 0;
+    height: 86dvh;
+  }
+}

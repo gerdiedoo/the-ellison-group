@@ -18,6 +18,7 @@ import './admin.css';
 import './workspace.css';
 import './workspace-modules.css';
 import './campaign.css';
+import './visitor-prompts.css';
 import { PublicOnly } from '@/components/shell/public-only';
 const serif = localFont({
   src: '../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2',

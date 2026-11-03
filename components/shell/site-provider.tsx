@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation';
 import type { LeadInput } from '@/lib/schemas';
 import { CaptureGateHost } from '@/components/forms/property-gate';
 import { VisitorChat } from '@/components/chat/visitor-chat';
+import { VisitorPrompts } from '@/components/shell/visitor-prompts';
 const Context = createContext<{
   openContact: (message?: string, extra?: Partial<LeadInput>) => void;
   toast: (message: string) => void;
@@ -141,6 +142,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
           <ProgressiveProfileLoader />
           <CaptureGateHost />
           <VisitorChat />
+          <VisitorPrompts />
         </>
       )}
       {isDev && <span className="dev-badge">DEV {isMock ? '· DEMO' : ''}</span>}

@@ -40,6 +40,13 @@ const editLead = (l: Lead) => ({
   follow_up_at: l.follow_up_at,
 });
 async function dismissCookies(page: Page) {
+  // These workspace scenarios use a returning visitor; onboarding has its own suite.
+  await page.evaluate(() => {
+    localStorage.setItem('ellison-welcome-v1', 'true');
+    sessionStorage.setItem('ellison-sign-in-dismissed-v1', 'true');
+  });
+  const welcome = page.getByRole('button', { name: 'Close welcome popup', exact: true });
+  if (await welcome.isVisible()) await welcome.click();
   const b = page.getByRole('button', { name: 'Essential only', exact: true });
   if (await b.isVisible()) await b.click();
 }
